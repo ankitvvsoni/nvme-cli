@@ -2065,6 +2065,75 @@ static int get_supp_cap_config_log(int argc, char **argv, struct command *cmd,
 	return err;
 }
 
+static int get_lockdown_log(int argc, char **argv, struct command *cmd,
+				   struct plugin *plugin)
+{
+	const char *cntss = "specifies the contents of the Command and Feature Identifier List "
+				"field in the log page.";
+	const char *ss = "specifies the scope of the Command and Feature Identifier List "
+				"field in the log page.";
+	const char *desc = "Retrieve the list of lockdown commands and features";
+	_cleanup_free_ struct nvme_lockdown_log *lock_log = NULL;
+	_cleanup_nvme_dev_ struct nvme_dev *dev = NULL;
+	nvme_print_flags_t flags;
+	int err = -1;
+	__u8 lsp = 0;
+
+	struct config {
+		__u8	contents;
+		__u8	scope;
+		bool	raw_binary;
+	};
+
+	struct config cfg = {
+		.contents	= 0,
+		.scope		= 0,
+		.raw_binary	= false,
+	};
+
+	NVME_ARGS(opts,
+		  OPT_BYTE("scope",		's', &cfg.scope,	ss),
+		  OPT_BYTE("contents",		'c', &cfg.contents,	cntss),
+		  OPT_FLAG("raw-binary",	'b', &cfg.raw_binary,	raw_use));
+
+	err = parse_and_open(&dev, argc, argv, desc, opts);
+	if (err)
+		return err;
+
+	err = validate_output_format(nvme_cfg.output_format, &flags);
+	if (err < 0) {
+		nvme_show_error("Invalid output format");
+		return err;
+	}
+
+	if (cfg.scope > 0xf) {
+		printf("scope is invalid.\n");
+		return -1;
+	}
+	if (cfg.contents > 3) {
+		printf("contents is invalid.\n");
+		return -1;
+	}
+	if (cfg.raw_binary)
+		flags = BINARY;
+
+	lock_log = nvme_alloc(sizeof(*lock_log));
+	if (!lock_log)
+		return -ENOMEM;
+
+	lsp = NVME_SET(cfg.contents, LOCKDOWN_CS) | NVME_SET(cfg.scope, LOCKDOWN_SS);
+
+	err = nvme_cli_get_log_lockdown(dev, lsp, lock_log);
+	if (!err)
+		nvme_show_lockdown_log(lock_log, flags);
+	else if (err > 0)
+		nvme_show_status(err);
+	else
+		nvme_show_perror("lockdown log");
+
+	return err;
+}
+
 static int io_mgmt_send(int argc, char **argv, struct command *cmd, struct plugin *plugin)
 {
 	const char *desc = "I/O Management Send";

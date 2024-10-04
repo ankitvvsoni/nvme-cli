@@ -2267,6 +2267,30 @@ static void json_supported_cap_config_log(
 	json_print(r);
 }
 
+static void json_lockdown_log(struct nvme_lockdown_log *log)
+{
+	struct json_object *entries = json_create_array();
+	struct json_object *r = json_create_object();
+        __u8 ss = NVME_GET(log->csss, LOCKDOWN_SS);
+       __u8 cs = NVME_GET(log->csss, LOCKDOWN_CS);
+	struct json_object *entry;
+	int i;
+
+	obj_add_uint(r, "cs", le16_to_cpu(cs));
+	obj_add_uint(r, "ss", le16_to_cpu(ss));
+	obj_add_uint(r, "length", le16_to_cpu(log->length));
+
+	for (i = 0; i < log->length; i++) {
+		entry = json_create_object();
+		obj_add_uint(entry, "id", log->cfil[i]);
+		array_add_obj(entries, entry);
+	}
+
+	obj_add_array(r, "lockdown_list", entries);
+
+	json_print(r);
+}
+
 static void json_nvme_fdp_configs(struct nvme_fdp_config_log *log, size_t len)
 {
 	struct json_object *r, *obj_configs;
@@ -4753,6 +4777,7 @@ static struct print_ops json_print_ops = {
 	.id_uuid_list			= json_nvme_id_uuid_list,
 	.lba_status			= json_lba_status,
 	.lba_status_log			= json_lba_status_log,
+	.lockdown_log			= json_lockdown_log,
 	.media_unit_stat_log		= json_media_unit_stat_log,
 	.mi_cmd_support_effects_log	= json_mi_cmd_support_effects_log,
 	.ns_list			= json_nvme_list_ns,

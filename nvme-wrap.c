@@ -350,6 +350,12 @@ int nvme_cli_get_log_persistent_event(struct nvme_dev *dev,
 			   pevent_log);
 }
 
+int nvme_cli_get_log_lockdown(struct nvme_dev *dev, __u16 cntss,
+				struct nvme_lockdown_log *log)
+{
+	return do_admin_op(get_log_lockdown, dev, cntss, log);
+}
+
 int nvme_cli_fw_download(struct nvme_dev *dev,
 			 struct nvme_fw_download_args *args)
 {

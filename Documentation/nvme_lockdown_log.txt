@@ -1,0 +1,50 @@
+nvme-lockdown-log(1)
+================================
+
+NAME
+----
+nvme-lockdown-log - Send NVMe Supported lockdown Log pages request, 
+returns result and log.
+
+SYNOPSIS
+--------
+[verse]
+'nvme lockdown-log' <device> [--scope | -s] [--contents | -c ] [--raw-binary | -b]
+			[--output-format=<fmt> | -o <fmt>]
+
+DESCRIPTION
+-----------
+Retrieves the list of Supported and prohibited lockdown commands/features
+details.
+
+The <device> parameter is mandatory and should be the NVMe character
+device (ex: /dev/nvme0).
+
+On success, the returned lockdown log pages log structure will be printed.
+
+OPTIONS
+-------
+-s::
+--scope::
+	To get log specific scope value.
+
+-c::
+--contents::
+	To get log specific contents value.
+
+-b::
+--raw-binary::
+	To show raw binary data.
+
+-o <fmt>::
+--output-format=<fmt>::
+	Set the reporting format to 'normal', 'json' or 'binary'. Only one
+	output format can be used at a time.
+
+EXAMPLES
+--------
+No examples provided yet.
+
+NVME
+----
+Part of the nvme-user suite

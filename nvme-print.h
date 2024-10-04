@@ -59,6 +59,7 @@ struct print_ops {
 	void (*id_uuid_list)(const struct nvme_id_uuid_list  *uuid_list);
 	void (*lba_status)(struct nvme_lba_status *list, unsigned long len);
 	void (*lba_status_log)(void *lba_status, __u32 size, const char *devname);
+	void (*lockdown_log)(struct nvme_lockdown_log *log);
 	void (*media_unit_stat_log)(struct nvme_media_unit_stat_log *mus);
 	void (*mi_cmd_support_effects_log)(struct nvme_mi_cmd_supported_effects_log *mi_cmd_log, const char *devname);
 	void (*ns_list)(struct nvme_ns_list *ns_list);
@@ -212,6 +213,8 @@ void nvme_show_media_unit_stat_log(struct nvme_media_unit_stat_log *mus,
 	nvme_print_flags_t flags);
 void nvme_show_supported_cap_config_log(struct nvme_supported_cap_config_list_log *caplog,
 				nvme_print_flags_t flags);
+void nvme_show_lockdown_log(struct nvme_lockdown_log *log,
+	nvme_print_flags_t flags);
 void nvme_show_ctrl_registers(void *bar, bool fabrics, nvme_print_flags_t flags);
 void nvme_show_ctrl_register(void *bar, bool fabrics, int offset, nvme_print_flags_t flags);
 void nvme_show_single_property(int offset, uint64_t prop, nvme_print_flags_t flags);

@@ -1024,6 +1024,64 @@ static void stdout_supported_cap_config_log(struct nvme_supported_cap_config_lis
 	}
 }
 
+static void lockdown_scope(struct nvme_lockdown_log *log, __u8 ss)
+{
+	__u8 cfi;
+	int op;
+
+	for (op = 0; op < log->length; op++) {
+		cfi = log->cfil[op];
+		switch (ss) {
+		case ADMIN_CMD:
+			printf("\t%s (%#x)\n", nvme_cmd_to_string(true, cfi), cfi);
+			break;
+		case FEATURE_ID:
+			printf("\t%s (%#x)\n", nvme_feature_to_string(cfi), cfi);
+			break;
+		case MI_CMD_SET:
+			printf("\tManagement Interface Command: %#x\n", cfi);
+			break;
+		case PCI_CMD_SET:
+			printf("\tPCIe Command: %#x\n", cfi);
+			break;
+		default:
+			printf("scope %d is reserved.\n", ss);
+			return;
+		}
+	}
+}
+
+static void stdout_lockdown_log(struct nvme_lockdown_log *log)
+{
+	__u8 ss = NVME_GET(log->csss, LOCKDOWN_SS);
+	__u8 cs = NVME_GET(log->csss, LOCKDOWN_CS);
+	char *mgmt = "manangement interface commands";
+	char *admin = "admin commands";
+	char *feature = "feature ids";
+	char *pci = "pci commands";
+	char *str;
+
+	str = (ss == 0) ? admin : (ss == 2) ? feature :
+			(ss == 3) ? mgmt : (ss == 4) ? pci : "reserved";
+	switch (cs) {
+	case SUPPORTED_LOCKDOWN_CMD:
+		printf("List of supported %s to be prohibited:\n", str);
+		lockdown_scope(log, ss);
+		break;
+	case PROHIBITED_CMD:
+		printf("List of %s currently prohibited:\n", str);
+		lockdown_scope(log, ss);
+		break;
+	case PROHIBITED_OUTOFBAND_CMD:
+		printf("List of out-of-band %s are prohibited:\n", str);
+		lockdown_scope(log, ss);
+		break;
+	default:
+		printf("content %d is reserved.\n", cs);
+		break;
+	}
+}
+
 static unsigned int stdout_subsystem_multipath(nvme_subsystem_t s)
 {
 	nvme_ns_t n;
@@ -5268,6 +5326,7 @@ static struct print_ops stdout_print_ops = {
 	.id_uuid_list			= stdout_id_uuid_list,
 	.lba_status			= stdout_lba_status,
 	.lba_status_log			= stdout_lba_status_log,
+	.lockdown_log			= stdout_lockdown_log,
 	.media_unit_stat_log		= stdout_media_unit_stat_log,
 	.mi_cmd_support_effects_log	= stdout_mi_cmd_support_effects_log,
 	.ns_list			= stdout_list_ns,

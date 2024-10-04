@@ -202,6 +202,10 @@ nvme_list_opts () {
 		opts+=" --dom-id= -d --output-format= -o \
 				--raw-binary -b"
 			;;
+		"lockdown-log")
+		opts+=" --scope= -s --contents= -c --output-format= -o \
+			--raw-binary -b"
+			;;
 		"get-feature")
 		opts+=" --namespace-id= -n --feature-id= -f --sel= -s \
 			--data-len= -l --cdw11= --c -uuid-index= -U --raw-binary -b \
@@ -1667,7 +1671,7 @@ _nvme_subcmds () {
 		rpmb boot-part-log fid-support-effects-log \
 		supported-log-pages lockdown media-unit-stat-log \
 		supported-cap-config-log dim show-topology list-endgrp \
-		nvme-mi-recv nvme-mi-send get-reg set-reg"
+		nvme-mi-recv nvme-mi-send get-reg set-reg lockdown-log"
 
 	# Add plugins:
 	for plugin in "${!_plugin_subcmds[@]}"; do

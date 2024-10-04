@@ -349,6 +349,12 @@ void nvme_show_supported_cap_config_log(
 	nvme_print(supported_cap_config_list_log, flags, cap);
 }
 
+void nvme_show_lockdown_log(struct nvme_lockdown_log *log,
+	nvme_print_flags_t flags)
+{
+	nvme_print(lockdown_log, flags, log);
+}
+
 void nvme_show_subsystem_list(nvme_root_t r, bool show_ana,
 			      nvme_print_flags_t flags)
 {

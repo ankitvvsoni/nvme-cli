@@ -276,6 +276,11 @@ static void binary_sanitize_log(struct nvme_sanitize_log_page *sanitize,
 	d_raw((unsigned char *)sanitize, sizeof(*sanitize));
 }
 
+static void binary_lockdown_log(struct nvme_lockdown_log *lockdown_log)
+{
+	d_raw((unsigned char *)lockdown_log, sizeof(*lockdown_log));
+}
+
 static void binary_directive(__u8 type, __u8 oper, __u16 spec, __u32 nsid, __u32 result,
 	void *buf, __u32 len)
 {
@@ -340,6 +345,7 @@ static struct print_ops binary_print_ops = {
 	.id_uuid_list			= binary_id_uuid_list,
 	.lba_status			= binary_lba_status,
 	.lba_status_log			= binary_lba_status_log,
+	.lockdown_log			= binary_lockdown_log,
 	.media_unit_stat_log		= binary_media_unit_stat_log,
 	.mi_cmd_support_effects_log	= binary_mi_cmd_support_effects_log,
 	.ns_list			= NULL,
